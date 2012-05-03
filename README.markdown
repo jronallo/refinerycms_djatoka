@@ -27,7 +27,7 @@ Refinery includes Javascript.
 
   ```
   gem 'djatoka'
-  gem 'refinerycms_djatoka', :git => 'TODO'
+  gem 'refinerycms_djatoka', :git => 'git://github.com/jronallo/refinerycms_djatoka.git'
   ```
 
 2. `bundle install`
