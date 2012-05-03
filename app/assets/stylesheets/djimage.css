@@ -1,0 +1,10 @@
+#djatoka_image_base_url{display:none;}
+#djatoka_image_container{
+  float:right;
+  width: 500px;
+  height: 450px;
+  overflow:auto;
+}
+#djimage_position label {display:inline;}
+#djimage_ajax_loader{float:right;}
+#djimage_select{overflow:auto;height:400px;}

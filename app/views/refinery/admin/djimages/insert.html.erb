@@ -1,0 +1,43 @@
+<div id='dialog_main'>
+  <div id="djimage_ajax_loader"><%= image_tag 'refinery/ajax-loader.gif' %></div>
+  <div id="djatoka_image_container"></div>
+  <div id='djimage_select'>
+    <h2>Djatoka Image Identifier</h2>
+        <%= label_tag :djimage_filename, 'Filename' %>
+        <%= text_field_tag :djimage_filename %>
+        <%= label_tag :djimage_scale, 'Scale' %>
+        <%= text_field_tag :djimage_scale %>
+        <%= label_tag :djimage_square, 'Square?' %>
+        <%= check_box_tag :djimage_square, 'Square' %>
+        <div id="djimage_position">
+          <p>Position (of square images)</p>
+          <% ['center', 'top_left', 'bottom_right'].each do |position| %>
+            <br><%= radio_button_tag :djimage_position, position, position == 'center' %>
+            <%= label_tag "djimage_position_#{position}", position.humanize %>
+          <% end -%>
+        </div>
+        <%= label_tag :djimage_title, 'Title' %>
+        <%= text_field_tag :djimage_title %>
+        
+        
+        <%= render '/refinery/admin/form_actions', :f => nil,
+             :cancel_url => '',
+             :submit_button_text => 'Insert',
+             :hide_submit => false,
+             :hide_cancel => false,
+             :hide_delete => true,
+             :cancel_title => nil %>
+         
+  </div>
+  <span id="djatoka_image_base_url"><%= refinery.djatoka_image_admin_djimages_path %></span>
+  
+</div>
+
+
+<% content_for :javascripts do %>
+  <script>
+    $(document).ready(function(){
+      djimage_dialog.init(<%= @callback.present? ? "self.parent.#{@callback}" : "null" %>);
+    });
+  </script>
+<% end %>

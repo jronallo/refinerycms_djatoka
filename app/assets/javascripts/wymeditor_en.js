@@ -1,0 +1,1 @@
+WYMeditor.STRINGS['en']['Djimage'] = 'Add Djatoka Image'

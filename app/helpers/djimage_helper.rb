@@ -1,0 +1,5 @@
+module DjimageHelper    
+  
+end
+    
+  

@@ -1,0 +1,187 @@
+<% environment.context_class.instance_eval { include DjimageHelper } %>
+
+Djimage = {};
+Djimage.url_creator = false;
+
+var custom_wymeditor_boot_options = { 
+  containersItems: [
+    {'name': 'h2', 'title':'Heading_2', 'css':'wym_containers_h2'}
+    , {'name': 'h3', 'title':'Heading_3', 'css':'wym_containers_h3'}
+    , {'name': 'p', 'title':'Paragraph', 'css':'wym_containers_p'}
+  ]
+  , toolsItems: [
+    {'name': 'Bold', 'title': 'Bold', 'css': 'wym_tools_strong'}
+    ,{'name': 'Italic', 'title': 'Emphasis', 'css': 'wym_tools_emphasis'}
+    ,{'name': 'InsertUnorderedList', 'title': 'Unordered_List', 'css': 'wym_tools_unordered_list'}
+    ,{'name': 'InsertOrderedList', 'title': 'Ordered_List', 'css': 'wym_tools_ordered_list'}
+    /*,{'name': 'Indent', 'title': 'Indent', 'css': 'wym_tools_indent'}
+    ,{'name': 'Outdent', 'title': 'Outdent', 'css': 'wym_tools_outdent'}
+    ,{'name': 'Undo', 'title': 'Undo', 'css': 'wym_tools_undo'}
+    ,{'name': 'Redo', 'title': 'Redo', 'css': 'wym_tools_redo'}*/
+    ,{'name': 'CreateLink', 'title': 'Link', 'css': 'wym_tools_link'}
+    ,{'name': 'Unlink', 'title': 'Unlink', 'css': 'wym_tools_unlink'}
+    ,{'name': 'InsertImage', 'title': 'Image', 'css': 'wym_tools_image'}
+    ,{'name': 'InsertDjimage', 'title': 'Djimage', 'css': 'wym_tools_djimage'} 
+    ,{'name': 'InsertTable', 'title': 'Table', 'css': 'wym_tools_table'}
+    //,{'name': 'Paste', 'title': 'Paste_From_Word', 'css': 'wym_tools_paste'}
+    ,{'name': 'ToggleHtml', 'title': 'HTML', 'css': 'wym_tools_html'}
+  ]
+  , filenameSelector: ".wym_filename"
+  , positionSelector: ".wym_position"
+  , DIALOG_DJIMAGE: "Djimage"
+  , INSERT_DJIMAGE: "InsertDjimage"
+  , dialogDjimageSelector:   ".wym_dialog_djimage"
+  , postInit: function(wym) { 
+         $(wym._box).find('li.wym_tools_djimage a').click(function(){ 
+             wym.dialog('Djimage') 
+         }); 
+        
+     } 
+  , postInitDialog: function(wym) {
+    $(wym._options.dialogDjimageSelector).find(wym._options.submitSelector).click(function(e){    
+      var replaceable = $(wym._doc.body).find('#' + wym._current_unique_stamp);
+      form = $(this.form);
+      if ((src = form.find(wym._options.srcSelector).val()) != null && src.length > 0) {
+        
+        (image = $(wym._doc.createElement("IMG")))
+          .attr(WYMeditor.SRC, form.find(wym._options.srcSelector).val())
+          .attr(WYMeditor.TITLE, form.find(wym._options.titleSelector).val())
+          .attr(WYMeditor.ALT, form.find(wym._options.altSelector).val())
+          .attr('style', form.find('.wym_style').val())
+          .attr('height', form.find('.wym_height').val())
+          .attr('width', form.find('.wym_width').val())
+          
+        if ((filename = form.find('.wym_filename').val()) != null && filename.length > 0 && Djimage.url_creator) {
+          var url = Djimage.url_creator(filename);
+          var link = $('<a></a>').attr('href', url).attr('target', '_blank');
+          var full_link = link.append(image);
+        }
+        
+  
+         // ensure we know where to put the image.
+         if (replaceable == null) {
+           replaceable = $(wym._doc.body).find("#" + wym._current_unique_stamp);
+         }
+         if (replaceable != null) {
+           if (full_link) {
+            replaceable.after(full_link).remove();
+          } else {
+            replaceable.after(image).remove();
+          }
+           
+         }
+  
+        // fire a click event on the dialogs close button
+        wym.close_dialog(e);
+      } else {
+        // remove any save loader animations.
+        $('iframe').contents().find('.save-loader').remove();
+        // tell the user.
+        alert("Please select an image to insert.");
+      }
+      e.preventDefault();
+      
+    });    
+  }
+  , dialogDjimageHtml: ""
+    
+}; 
+
+var djimage_dialog = {
+  init: function(callback){
+
+    if (!this.initialised) {
+      this.callback = callback;
+      this.init_actions();
+      this.initialised = true;
+    }
+    return this;
+  }
+  
+  , update_parent: function(image, filename) {
+    if (parent != null) {
+      if ((wym_filename = parent.document.getElementById('wym_filename')) != null) {
+        wym_filename.value = filename;
+      }
+      if ((wym_src = parent.document.getElementById('wym_src')) != null) {
+        wym_src.value = image.attr('src');
+      }
+      if ((wym_title = parent.document.getElementById('wym_title')) != null) {
+        wym_title.value = image.attr('title');
+      }
+      if ((wym_height = parent.document.getElementById('wym_height')) != null) {
+        if (image.attr('height')){
+          wym_height.value = image.attr('height');
+        } else {wym_height.value = ''}
+      }
+      if ((wym_width = parent.document.getElementById('wym_width')) != null) {
+        if (image.attr('width')){
+          wym_width.value = image.attr('width');
+        } else {wym_width.value = ''}
+      }
+      if ((wym_style = parent.document.getElementById('wym_style')) != null) {
+        if (image.attr('style')){
+          wym_style.value = image.attr('style');
+        } else {wym_style.value = ''}   
+      }
+    }
+  }
+  
+  , init_actions: function(){
+    var _this = this;
+    // get submit buttons not inside a wymeditor iframe
+    $('.form-actions-dialog #submit_button')
+      .not('.wym_iframe_body #existing_image_area .form-actions-dialog #submit_button')
+      .click(function(){
+        $(parent.document.getElementById('wym_dialog_submit')).click();
+      });
+      //.click($.proxy(_this.submit_image_choice, _this));
+
+    // get cancel buttons not inside a wymeditor iframe
+    $('.form-actions-dialog #cancel_button')
+      .not('.wym_iframe_body .form-actions-dialog #cancel_button')
+      .click($.proxy(close_dialog, _this));
+      
+    $('#djimage_filename,#djimage_scale').keyup(function(){
+      djimage_dialog.ajax_update_djimage();     
+    });
+    $('#djimage_square, #djimage_position label, #djimage_position input').click(function(){
+      djimage_dialog.ajax_update_djimage(); 
+    });
+    
+    //loading of the image
+    $('#djimage_ajax_loader img').hide();  // hide it initially
+    $('#djimage_position').hide();
+  }
+  , ajax_update_djimage: function(){
+      $('#djimage_ajax_loader img').show();
+      var base_url = $('#djatoka_image_base_url').text();
+      var params = {}
+      var filename = $('#djimage_filename').val();
+      params.filename = filename;
+      params.scale = $('#djimage_scale').val();
+      params.title = $('#djimage_title').val();
+      if ($('#djimage_square').attr('checked')){
+        $('#djimage_position').show();
+        params.square = true;
+        params.position = $("input[name=djimage_position]:checked").val();
+      } else {
+        $('#djimage_position').hide();
+      }
+      $.ajax({
+        url: base_url + '?' + jQuery.param(params),
+        success: function(data){
+          $('#djatoka_image_container').html(data);
+          djimage_dialog.update_parent( $('#djatoka_image_container img'), filename );
+          $('#djimage_ajax_loader img').hide();
+        }
+      });
+  }
+  
+  
+}
+
+
+
+
+

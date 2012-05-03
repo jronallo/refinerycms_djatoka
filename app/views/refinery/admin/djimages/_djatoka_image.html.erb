@@ -1,0 +1,12 @@
+<% if params[:square] -%>
+  <% if params[:position] == 'center' %>
+    <%= djatoka_square_image_tag params[:filename], @djatoka_params %>
+  <% elsif params[:position] == 'top_left' %>
+    <%= djatoka_top_left_square_image_tag params[:filename], @djatoka_params %>
+  <% elsif params[:position] == 'bottom_right'%>
+    <%= djatoka_bottom_right_square_image_tag params[:filename], @djatoka_params %>
+  <% end -%>
+<% else -%>
+  <%= djatoka_image_tag params[:filename], @djatoka_params.merge({:style => "max-height:#{@djatoka_params[:scale]}px;max-width:#{@djatoka_params[:scale]}px"})
+  %>
+<% end -%>
